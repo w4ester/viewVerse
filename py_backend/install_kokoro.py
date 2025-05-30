@@ -10,6 +10,7 @@ import subprocess
 import sys
 import os
 import logging
+from security import safe_command
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -19,7 +20,7 @@ def run_command(command, description):
     """Run a command and handle errors"""
     logger.info(f"🔄 {description}...")
     try:
-        result = subprocess.run(command, shell=True, check=True, capture_output=True, text=True)
+        result = safe_command.run(subprocess.run, command, shell=True, check=True, capture_output=True, text=True)
         logger.info(f"✅ {description} completed successfully")
         return True
     except subprocess.CalledProcessError as e:
