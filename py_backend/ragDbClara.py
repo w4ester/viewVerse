@@ -14,6 +14,7 @@ import time
 import logging
 import traceback
 import os
+from security import safe_requests
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -33,7 +34,7 @@ def get_ollama_host():
         
     def try_connection(host):
         try:
-            response = requests.get(f'http://{host}:11434/api/tags', timeout=2)
+            response = safe_requests.get(f'http://{host}:11434/api/tags', timeout=2)
             return response.status_code == 200
         except (requests.RequestException, requests.Timeout):
             return False
@@ -132,7 +133,7 @@ class DocumentAI:
             current_time = time.time()
             # Only update cache if TTL has expired
             if current_time - self._last_cache_update > self._cache_ttl:
-                response = requests.get(f"{self.ollama_base_url}/api/tags")
+                response = safe_requests.get(f"{self.ollama_base_url}/api/tags")
                 if response.status_code == 200:
                     self.__class__._available_models_cache = set(
                         model["name"] for model in response.json().get("models", [])
@@ -160,7 +161,7 @@ class DocumentAI:
             
         # If not in cache, check API directly
         try:
-            response = requests.get(f"{self.ollama_base_url}/api/tags")
+            response = safe_requests.get(f"{self.ollama_base_url}/api/tags")
             if response.status_code == 200:
                 available_models = [model["name"] for model in response.json().get("models", [])]
                 
