@@ -132,7 +132,7 @@ class DocumentAI:
             current_time = time.time()
             # Only update cache if TTL has expired
             if current_time - self._last_cache_update > self._cache_ttl:
-                response = requests.get(f"{self.ollama_base_url}/api/tags")
+                response = requests.get(f"{self.ollama_base_url}/api/tags", timeout=60)
                 if response.status_code == 200:
                     self.__class__._available_models_cache = set(
                         model["name"] for model in response.json().get("models", [])
@@ -160,7 +160,7 @@ class DocumentAI:
             
         # If not in cache, check API directly
         try:
-            response = requests.get(f"{self.ollama_base_url}/api/tags")
+            response = requests.get(f"{self.ollama_base_url}/api/tags", timeout=60)
             if response.status_code == 200:
                 available_models = [model["name"] for model in response.json().get("models", [])]
                 
@@ -196,8 +196,8 @@ class DocumentAI:
             response = requests.post(
                 f"{self.ollama_base_url}/api/pull",
                 json={"name": model_name},
-                stream=True
-            )
+                stream=True, 
+            timeout=60)
             
             if response.status_code == 200:
                 # Process streaming response to show progress
